@@ -53,6 +53,9 @@ public abstract class ConfigTypeConveration<T> {
 		if (types.containsKey(typeClass))
 			return true;
 		
+		if (typeClass.isAnnotationPresent(CreativeConfig.class))
+			return false;
+		
 		for (int i = 0; i < specialTypes.size(); i++)
 			if (specialTypes.get(i).key.test(typeClass))
 				return true;
@@ -156,7 +159,7 @@ public abstract class ConfigTypeConveration<T> {
 			@Override
 			@SideOnly(Side.CLIENT)
 			public void createControls(GuiParent parent, Class clazz, int recommendedWidth) {
-				
+			
 			}
 			
 			@Override
@@ -360,7 +363,7 @@ public abstract class ConfigTypeConveration<T> {
 				if (element.isJsonObject())
 					defaultValue.load(loadDefault, ignoreRestart, (JsonObject) element, side);
 				else
-					defaultValue.restoreDefault(side);
+					defaultValue.restoreDefault(side, ignoreRestart);
 				return defaultValue;
 			}
 			
@@ -372,7 +375,7 @@ public abstract class ConfigTypeConveration<T> {
 			@Override
 			@SideOnly(Side.CLIENT)
 			public void createControls(GuiParent parent, @Nullable ConfigKeyField key, Class clazz, int recommendedWidth) {
-				
+			
 			}
 			
 			@Override
@@ -392,7 +395,7 @@ public abstract class ConfigTypeConveration<T> {
 				return null;
 			}
 		});
-		
+			
 		registerType(ConfigHolderDynamic.class, new ConfigTypeConveration<ConfigHolderDynamic>() {
 			
 			@Override
@@ -400,7 +403,7 @@ public abstract class ConfigTypeConveration<T> {
 				if (element.isJsonObject())
 					defaultValue.load(loadDefault, ignoreRestart, (JsonObject) element, side);
 				else
-					defaultValue.restoreDefault(side);
+					defaultValue.restoreDefault(side, ignoreRestart);
 				return defaultValue;
 			}
 			
@@ -412,7 +415,7 @@ public abstract class ConfigTypeConveration<T> {
 			@Override
 			@SideOnly(Side.CLIENT)
 			public void createControls(GuiParent parent, @Nullable ConfigKeyField key, Class clazz, int recommendedWidth) {
-				
+			
 			}
 			
 			@Override
@@ -432,7 +435,7 @@ public abstract class ConfigTypeConveration<T> {
 				return null;
 			}
 		});
-		
+			
 		registerSpecialType((x) -> {
 			if (x.isArray()) {
 				if (has(x.getComponentType()))
@@ -586,7 +589,7 @@ public abstract class ConfigTypeConveration<T> {
 			}
 		});
 		
-		registerSpecialType((x) -> x == List.class || x == ArrayList.class, new ConfigTypeConveration<List>() {
+		registerSpecialType((x) -> List.class.isAssignableFrom(x) || x == ArrayList.class, new ConfigTypeConveration<List>() {
 			
 			@Override
 			public List readElement(List defaultValue, boolean loadDefault, boolean ignoreRestart, JsonElement element, Side side, @Nullable ConfigKeyField key) {
@@ -676,6 +679,7 @@ public abstract class ConfigTypeConveration<T> {
 			public Class getListType(ConfigKeyField key) {
 				ParameterizedType type = (ParameterizedType) key.field.getGenericType();
 				return (Class) type.getActualTypeArguments()[0];
+				
 			}
 		});
 	}

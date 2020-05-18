@@ -34,10 +34,7 @@ public class RenderCubeObject extends CubeObject {
 	
 	public static enum EnumSideRender {
 		
-		INSIDE_RENDERED(true, false),
-		INSIDE_NOT_RENDERED(false, false),
-		OUTSIDE_RENDERED(true, true),
-		OUTSIDE_NOT_RENDERD(false, true);
+		INSIDE_RENDERED(true, false), INSIDE_NOT_RENDERED(false, false), OUTSIDE_RENDERED(true, true), OUTSIDE_NOT_RENDERD(false, true);
 		
 		public final boolean shouldBeRendered;
 		public final boolean outside;
@@ -56,6 +53,7 @@ public class RenderCubeObject extends CubeObject {
 	public Object customData = null;
 	
 	public boolean keepVU = false;
+	public boolean allowOverlap = false;
 	
 	private EnumSideRender renderEast = EnumSideRender.INSIDE_RENDERED;
 	private EnumSideRender renderWest = EnumSideRender.INSIDE_RENDERED;
@@ -176,6 +174,11 @@ public class RenderCubeObject extends CubeObject {
 	
 	public RenderCubeObject setColor(int color) {
 		this.color = color;
+		return this;
+	}
+	
+	public RenderCubeObject setKeepUV(boolean keep) {
+		this.keepVU = keep;
 		return this;
 	}
 	
@@ -365,9 +368,9 @@ public class RenderCubeObject extends CubeObject {
 				
 				index = k * quad.getFormat().getIntegerSize();
 				
-				float x = facing.getAxis() == Axis.X ? getVertexInformationPosition(vertex.xIndex) - offset.getX() : MathHelper.clamp(getVertexInformationPosition(vertex.xIndex) - offset.getX(), minX, maxX);
-				float y = facing.getAxis() == Axis.Y ? getVertexInformationPosition(vertex.yIndex) - offset.getY() : MathHelper.clamp(getVertexInformationPosition(vertex.yIndex) - offset.getY(), minY, maxY);
-				float z = facing.getAxis() == Axis.Z ? getVertexInformationPosition(vertex.zIndex) - offset.getZ() : MathHelper.clamp(getVertexInformationPosition(vertex.zIndex) - offset.getZ(), minZ, maxZ);
+				float x = facing.getAxis() == Axis.X || allowOverlap ? getVertexInformationPosition(vertex.xIndex) - offset.getX() : MathHelper.clamp(getVertexInformationPosition(vertex.xIndex) - offset.getX(), minX, maxX);
+				float y = facing.getAxis() == Axis.Y || allowOverlap ? getVertexInformationPosition(vertex.yIndex) - offset.getY() : MathHelper.clamp(getVertexInformationPosition(vertex.yIndex) - offset.getY(), minY, maxY);
+				float z = facing.getAxis() == Axis.Z || allowOverlap ? getVertexInformationPosition(vertex.zIndex) - offset.getZ() : MathHelper.clamp(getVertexInformationPosition(vertex.zIndex) - offset.getZ(), minZ, maxZ);
 				
 				float oldX = Float.intBitsToFloat(quad.getVertexData()[index]);
 				float oldY = Float.intBitsToFloat(quad.getVertexData()[index + 1]);
